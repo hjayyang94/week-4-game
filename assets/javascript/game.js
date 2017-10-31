@@ -19,7 +19,9 @@ $(document).ready(function () {
 
         atkClicked: function (enemy) {
             this.health -= enemy.cAttack;
-            this.attack = (this.attack + this.attack);
+            addition = this.attack;
+            console.log(addition);
+            this.attack += addition;
         },
 
         takeDamage: function (playerChar) {
@@ -34,10 +36,10 @@ $(document).ready(function () {
         },
 
         reset: function () {
-            health = 120;
-            attack = 6;
-            cAttack = 6;
-            isAlive = true;
+            this.health = 120;
+            this.attack = 6;
+            this.cAttack = 6;
+            this.isAlive = true;
         },
     }
 
@@ -61,10 +63,10 @@ $(document).ready(function () {
             this.health -= playerChar.attack;
         },
         reset: function () {
-            health = 100;
-            attack = 9;
-            cAttack = 4;
-            isAlive = true;
+            this.health = 100;
+            this.attack = 9;
+            this.cAttack = 4;
+            this.isAlive = true;
         },
     }
 
@@ -88,10 +90,10 @@ $(document).ready(function () {
             this.health -= playerChar.attack;
         },
         reset: function () {
-            health = 120;
-            attack = 4;
-            cAttack = 17;
-            isAlive = true;
+            this.health = 120;
+            this.attack = 4;
+            this.cAttack = 17;
+            this.isAlive = true;
         },
     }
 
@@ -114,15 +116,17 @@ $(document).ready(function () {
             if (this.health <= 0) { this.isAlive = false }
         },
         reset: function () {
-            health = 70;
-            attack = 10;
-            cAttack = 20;
-            isAlive = true;
+            this.health = 70;
+            this.attack = 10;
+            this.cAttack = 20;
+            this.isAlive = true;
         },
     }
     var charList = [Obi, Luke, DMaul, Sith];
 
     function startOver() {
+        charList = [Obi, Luke, DMaul, Sith];
+        strCharList = ["Obi", "Luke", "DMaul", "Sith"];
         Obi.reset();
         Luke.reset();
         DMaul.reset();
@@ -131,8 +135,6 @@ $(document).ready(function () {
         isGameOver = false;
         enemiesLeft = undefined;
         defenderChar = undefined;
-        charList = [Obi, Luke, DMaul, Sith];
-        strCharList = ["Obi", "Luke", "DMaul", "Sith"];
 
     }
 
@@ -162,6 +164,9 @@ $(document).ready(function () {
             heroImg.attr("value", playerChar.str);
             heroImg.addClass("enemies");
             $("#yourCharacter").html(heroImg);
+
+            $("#status").html("- Your stats - HP: " + playerChar.health + "   Attack Power: " + playerChar.attack);
+
             isPlayerSelected = true;
 
             for (var i = 0; i < charList.length; i++) {
@@ -175,7 +180,7 @@ $(document).ready(function () {
             chooseDefender();
 
         })
-        
+
     }
 
     function chooseDefender() {
@@ -193,7 +198,6 @@ $(document).ready(function () {
             defImg.addClass("enemies");
             $("#defender").html(defImg);
             isPlayerSelected = true;
-            clickFight();
         })
     }
 
@@ -204,18 +208,44 @@ $(document).ready(function () {
             if (playerChar != undefined) {
                 if (defenderChar != undefined) {
                     if (playerChar.isAlive) {
-                        playerChar.atkClicked(defenderChar);
-                        playerChar.checkAlive();
-                        defenderChar.takeDamage(playerChar);
+                        if (charList.length !== 0) {
+                            playerChar.atkClicked(defenderChar);
+                            playerChar.checkAlive();
+                            defenderChar.takeDamage(playerChar);
+                            defenderChar.checkAlive();
 
-                        clickReset();
-                        $("#endingArea").append("You have attacked! \nYour Attack Power is now at: " + playerChar.attack);
+                            clickReset();
+                            $("#endingArea").append("You have attacked! \nYour Attack Power is now at: " + playerChar.attack);
+                            $("#status").html("- Your stats - HP: " + playerChar.health + "   Attack Power: " + playerChar.attack);
 
-                        if (!defenderChar.isAlive) {
-                            $("#endingArea").append("The enemy has fallen! Pick another enemy to fight");
-                            defenderChar = undefined;
-                            $("#defender").empty();
+                            if (!defenderChar.isAlive) {
+                                $("#endingArea").append("The enemy has fallen! Pick another enemy to fight");
+                                var index = strCharList.indexOf(defenderChar.str);
+                                strCharList.splice(index, 1);
+                                charList.splice(index, 1);
+                                defenderChar = undefined;
+
+                                $("#enemiesList").empty();
+
+                                for (var i = 0; i < charList.length; i++) {
+                                    var imgEnemies = $("<img>");
+                                    imgEnemies.addClass("charImage");
+                                    imgEnemies.attr("src", "assets/images/" + charList[i].imgLink);
+                                    imgEnemies.attr("value", charList[i].str);
+                                    imgEnemies.addClass("enemies");
+                                    $("#enemiesList").append(imgEnemies);
+                                }
+                                $("#defender").empty();
+                                if(charList.length == 0){
+                                    alert("You won! press reset to play again");
+                                    isGameOver = true;
+                                    return;
+                                }
+                                chooseDefender();
+                            }
                         }
+                        
+
                     }
 
                     else {
@@ -238,7 +268,7 @@ $(document).ready(function () {
 
     function clickReset() {
         $("#resetButton").on("click", function () {
-            $("#yourCharacter, #enemiesList, #defender, #endingArea").empty();
+            $("#yourCharacter, #enemiesList, #defender, #status, #endingArea").empty();
             startOver();
             for (var i = 0; i < charList.length; i++) {
                 var imgList = $("<img>");
@@ -251,8 +281,8 @@ $(document).ready(function () {
         });
 
     }
-
+    clickFight();
     chooseChar();
-   
+
 
 });

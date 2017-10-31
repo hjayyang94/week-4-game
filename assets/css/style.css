@@ -1,4 +1,16 @@
+body{
+    background-image: url("../images/background.jpg");
+    
+}
+
 .charImage{
     width: 200px;
     height: 300px;
+    margin: 10px;
 }
+
+#status {
+    background-color: white;
+}
+
+
